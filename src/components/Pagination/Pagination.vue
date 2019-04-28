@@ -6,8 +6,8 @@
         <li :class="{ disabled:currentPage === 1}"
            @click="setCurrentPage(1)">首页</li>
         <li  v-for="list in pageList"
-             :class="{ active:list.value === currentPage }"
-             @click="setCurrentPage(list.value)"
+             :class="{ active:list.value === currentPage,point:list.type ==='point'}"
+             @click="setCurrentPage(list)"
         >{{ list.text }}</li>
         <li :class="{ disabled:currentPage === pageNum}"
             @click="setCurrentPage(pageNum)">尾页</li>
@@ -20,14 +20,18 @@
     export default {
         name: 'Pagination',
         props: {
-            pageSize:{
+            pageSize:{//一页多少条数据
                 type: Number,
                 default: 2
-            },//一页多少条数据
-            total:{
+            },
+            total:{//总条数
                 type: Number,
-                default: 12
-            }//总页数
+                default: 40
+            },
+            pagegroup:{//分页条数
+                type:Number,
+                default:5
+            }
         },
         data(){
             return {
@@ -35,20 +39,84 @@
             }
         },
         computed:{
-            pageList:function () {
-                var list = [
-                    {text:1,value:1},
-                    {text:2,value:2},
-                    {text:3,value:3},
-                    {text:4,value:4},
-                    {text:'...',value:5},
-                    {text:6,value:6}
-                ];
-                return list;
-
-            },
             pageNum:function () {
+                //一共多少页
                 return Math.ceil( this.total / this.pageSize)
+            },
+            pageList:function () {
+                let len = this.pageNum,temp = [],list=[];
+                if(len <= this.pagegroup){
+                    //5页一组，如果页数小于等于不显示点点点
+                    while(len--){
+                        temp.push({text:this.pageNum - len,value:this.pageNum-len});
+                    }
+                    return temp;
+                }
+                while (len--) {
+                    temp.push(this.pageNum - len);
+                }
+                if(this.currentPage < this.pagegroup - 1 ){
+                    // 1,2,3,4,5,...,8
+                    temp.forEach((item,i)=>{
+                        if(i >= 0 && i < this.pagegroup){//0,1,2,3,4
+                            list.push({text:i+1,value:i+1});
+                        }else if(i === this.pagegroup){
+                            list.push({text:'...',value:this.pagegroup,type:'point'});
+                        }else if( i === this.pageNum-1 ){
+                            list.push({text:this.pageNum,value:this.pageNum});
+                        }
+                    });
+                    return list;
+                }
+                if(this.currentPage === this.pagegroup - 1){
+                    temp.forEach((item,i)=>{
+                        if(i >= 0 && i <= this.pagegroup){//0-5
+                            list.push({text:i+1,value:i+1});
+                        }else if(i === this.pagegroup+1){
+                            if(i < this.pageNum-2){
+                                list.push({text:'...',value:this.pageNum-1,type:'point'});
+                            }
+                            list.push({text:this.pageNum,value:this.pageNum});
+                        }
+                    });
+                    return list;
+                }
+                if(this.currentPage >= this.pagegroup && this.currentPage < this.pageNum-4){
+                    list.push({text:1,value:1});
+                    list.push({text:'...',value:2,type:'point'});
+                    let center = this.currentPage;
+                    let lastPage = center+2;
+                    if(lastPage < this.pageNum-2){
+                        for(let i=center-2;i<=lastPage;i++){
+                            list.push({text:i,value:i});
+                        }
+                        list.push({text:'...',value:this.pageNum-1,type:'point'});
+                        list.push({text:this.pageNum,value:this.pageNum});
+                    }else{
+                        for(let i= this.pageNum-4;i<=this.pageNum;i++){
+                            list.push({text:i,value:i});
+                        }
+                    }
+                    return list;
+                }
+                if(this.currentPage === this.pageNum-4){
+                    list.push({text:1,value:1});
+                    list.push({text:'...',value:2,type:'point'});
+                    for(let i=this.currentPage-2;i<=this.currentPage+2;i++){
+                        list.push({text:i,value:i});
+                    }
+                    list.push({text:'...',value:this.pageNum-1,type:'point'});
+                    list.push({text:this.pageNum,value:this.pageNum});
+                    return list;
+                }
+                if(this.currentPage > this.pageNum-4){
+                    list.push({text:1,value:1});
+                    list.push({text:'...',value:2,type:'point'});
+                    for(let i=this.pageNum-4;i<=this.pageNum;i++){
+                        list.push({text:i,value:i});
+                    }
+                    return list;
+                }
             }
         },
         methods:{
@@ -59,8 +127,8 @@
                 }else if(value === 'reduce'){
                     //减
                     this.currentPage > 1 ? this.currentPage-- : 1;
-                }else{
-                    this.currentPage = value;
+                }else if(!value.type){
+                    this.currentPage = value.value||value;
                 }
             }
         }
@@ -84,6 +152,11 @@
             margin-left: -1px;
             font-size: 14px;
             cursor: pointer;
+            border-radius: 6px;
+            &.point{
+                border: none;
+                cursor: default;
+            }
             &:hover{
                 border-color: #6da8f2;
             }
