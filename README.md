@@ -16,4 +16,8 @@
 
 ``<Pagination :pageSize="pageSize" :total="total"  v-on:pageCallback="pageCallback"></Pagination>``
 
-## 查看效果地址：[分页组件](https://yuepu.github.io/pagination/)
+## 查看：
+
+1、[分页组件效果](https://yuepu.github.io/pagination/)
+
+2、分页组件代码：git@github.com:yuepu/vue-pagination.git
