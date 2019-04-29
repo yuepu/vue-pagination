@@ -1,3 +1,8 @@
+<!--
+说明：分页组件
+传参：pageSize（一页多少数据） total（所有的数据）
+出参：currentPage（点击的当前页）
+-->
 <template>
     <ul class="pagination">
         <li :class="{ disabled:currentPage === 1}"
@@ -22,20 +27,17 @@
         props: {
             pageSize:{//一页多少条数据
                 type: Number,
-                default: 2
+                default: 1
             },
             total:{//总条数
                 type: Number,
-                default: 40
-            },
-            pagegroup:{//分页条数
-                type:Number,
-                default:5
+                default: 1
             }
         },
         data(){
             return {
-                currentPage: 1
+                currentPage: 1,
+                pagegroup:5
             }
         },
         computed:{
@@ -55,21 +57,25 @@
                 while (len--) {
                     temp.push(this.pageNum - len);
                 }
+                //当前页小于this.pagegroup - 1
                 if(this.currentPage < this.pagegroup - 1 ){
-                    // 1,2,3,4,5,...,8
-                    temp.forEach((item,i)=>{
-                        if(i >= 0 && i < this.pagegroup){//0,1,2,3,4
-                            list.push({text:i+1,value:i+1});
-                        }else if(i === this.pagegroup){
-                            list.push({text:'...',value:this.pagegroup,type:'point'});
-                        }else if( i === this.pageNum-1 ){
-                            list.push({text:this.pageNum,value:this.pageNum});
-                        }
-                    });
+                    for(let i = 0; i < this.pagegroup; i++){
+                        list.push({text:i+1,value:i+1});
+                    }
+                    list.push({text:'...',value:this.pagegroup,type:'point'});
+                    list.push({text:this.pageNum,value:this.pageNum});
                     return list;
                 }
+                //第this.pagegroup - 1页
                 if(this.currentPage === this.pagegroup - 1){
-                    temp.forEach((item,i)=>{
+                    for(let i = 0; i <= this.pagegroup; i++){
+                        list.push({text:i+1,value:i+1});
+                    }
+                    list.push({text:'...',value:this.pagegroup,type:'point'});
+
+                    list.push({text:this.pageNum,value:this.pageNum});
+
+                    /*    temp.forEach((item,i)=>{
                         if(i >= 0 && i <= this.pagegroup){//0-5
                             list.push({text:i+1,value:i+1});
                         }else if(i === this.pagegroup+1){
@@ -78,9 +84,10 @@
                             }
                             list.push({text:this.pageNum,value:this.pageNum});
                         }
-                    });
+                    });*/
                     return list;
                 }
+                // 当前页大于this.pagegroup 并且小于this.pageNum-4
                 if(this.currentPage >= this.pagegroup && this.currentPage < this.pageNum-4){
                     list.push({text:1,value:1});
                     list.push({text:'...',value:2,type:'point'});
@@ -99,6 +106,7 @@
                     }
                     return list;
                 }
+                //当前页数为this.pageNum-4
                 if(this.currentPage === this.pageNum-4){
                     list.push({text:1,value:1});
                     list.push({text:'...',value:2,type:'point'});
@@ -109,6 +117,7 @@
                     list.push({text:this.pageNum,value:this.pageNum});
                     return list;
                 }
+                //当前页数大于this.page-4
                 if(this.currentPage > this.pageNum-4){
                     list.push({text:1,value:1});
                     list.push({text:'...',value:2,type:'point'});
@@ -130,6 +139,8 @@
                 }else if(!value.type){
                     this.currentPage = value.value||value;
                 }
+
+                this.$emit('pageCallback',{currentPage:this.currentPage});
             }
         }
 
