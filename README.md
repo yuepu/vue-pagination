@@ -14,9 +14,6 @@
 
 2、然后使用组件
 
-``
-<Pagination :pageSize="pageSize" :total="total"  v-on:pageCallback="pageCallback"></Pagination>
-
-``
+``<Pagination :pageSize="pageSize" :total="total"  v-on:pageCallback="pageCallback"></Pagination>``
 
 ## 查看效果地址：[分页组件](https://yuepu.github.io/pagination/)
