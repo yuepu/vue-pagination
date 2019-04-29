@@ -19,5 +19,4 @@
 
 ``
 
----
- ## 查看效果地址：[分页组件](https://yuepu.github.io/pagination/)
+## 查看效果地址：[分页组件](https://yuepu.github.io/pagination/)
